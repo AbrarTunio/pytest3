@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TechBridge Python Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<style>
+/* ── Reset & Base ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #0a0e1a;
+  --panel:     #111827;
+  --panel2:    #1a2035;
+  --border:    #2a3150;
+  --accent:    #4f8ef7;
+  --accent2:   #7c6af7;
+  --teal:      #00d4aa;
+  --red:       #ff5757;
+  --yellow:    #fbbf24;
+  --text:      #e8eaf6;
+  --muted:     #6b7db3;
+  --muted2:    #3d4f7a;
+  --white:     #ffffff;
+
+  /* syntax colors */
+  --kw:   #c792ea;
+  --str:  #c3e88d;
+  --num:  #f78c6c;
+  --fn:   #82aaff;
+  --op:   #89ddff;
+  --cm:   #546e7a;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* ── Layout Shell ─────────────────────────────────────────── */
+#app {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+.screen { display: none; width: 100%; }
+.screen.active { display: flex; flex-direction: column; align-items: center; }
+
+/* ── Welcome Screen ───────────────────────────────────────── */
+.welcome-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 52px 48px 44px;
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+}
+
+.logo-icon {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 48px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -2px;
+  line-height: 1;
+  margin-bottom: 20px;
+}
+
+.welcome-card h1 {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+
+.welcome-card .subtitle {
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 36px;
+}
+
+.stats-row {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 36px;
+}
+
+.stat {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 20px;
+  text-align: center;
+}
+
+.stat-num {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+.name-label {
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+#studentName {
+  width: 100%;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  color: var(--white);
+  outline: none;
+  transition: border-color 0.2s;
+  margin-bottom: 20px;
+}
+
+#studentName:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(79,142,247,0.15);
+}
+
+#studentName.error {
+  border-color: var(--red);
+  animation: shake 0.3s ease;
+}
+
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+.rules-list {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 28px;
+  text-align: left;
+}
+
+.rules-list li {
+  list-style: none;
+  font-size: 13px;
+  color: var(--muted);
+  padding: 3px 0;
+  padding-left: 20px;
+  position: relative;
+}
+
+.rules-list li::before {
+  content: '›';
+  position: absolute;
+  left: 4px;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* ── Buttons ──────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 28px;
+  border-radius: 10px;
+  border: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--bg);
+  width: 100%;
+  justify-content: center;
+  font-size: 15px;
+  padding: 15px 28px;
+}
+
+.btn-primary:hover { background: #6ba3ff; transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+
+.btn-ghost {
+  background: var(--panel2);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+.btn-success {
+  background: var(--teal);
+  color: var(--bg);
+}
+
+.btn-success:hover { background: #00efc0; }
+
+.btn-danger {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  font-size: 13px;
+  padding: 10px 20px;
+}
+
+.btn-danger:hover { border-color: var(--red); color: var(--red); }
+
+/* ── Quiz Screen ──────────────────────────────────────────── */
+.quiz-wrapper {
+  width: 100%;
+  max-width: 760px;
+}
+
+/* top bar */
+.quiz-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.quiz-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.q-counter {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.q-counter span {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.topic-badge {
+  background: rgba(79,142,247,0.12);
+  border: 1px solid rgba(79,142,247,0.25);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.student-tag {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* progress bar */
+.progress-track {
+  height: 3px;
+  background: var(--border);
+  border-radius: 3px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  border-radius: 3px;
+  transition: width 0.35s ease;
+}
+
+/* question card */
+.question-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.card-prompt {
+  padding: 20px 24px 12px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.card-prompt strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* code editor block */
+.code-editor {
+  background: #0d1117;
+  border-top: 1px solid var(--border);
+}
+
+.editor-titlebar {
+  background: #161b22;
+  border-bottom: 1px solid #21262d;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dot { width: 12px; height: 12px; border-radius: 50%; }
+.dot-r { background: #ff5f57; }
+.dot-y { background: #febc2e; }
+.dot-g { background: #28c840; }
+
+.editor-filename {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: #6e7681;
+  margin-left: 4px;
+}
+
+.code-body {
+  padding: 20px 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 2;
+  overflow-x: auto;
+}
+
+.code-line {
+  display: flex;
+  align-items: center;
+  padding: 0 20px 0 0;
+  min-height: 32px;
+}
+
+.line-num {
+  min-width: 44px;
+  text-align: right;
+  padding-right: 20px;
+  color: #3d4f6a;
+  font-size: 13px;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.line-content {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0;
+  color: var(--text);
+  white-space: pre;
+}
+
+/* syntax highlight spans */
+.kw  { color: var(--kw); }
+.str { color: var(--str); }
+.num { color: var(--num); }
+.fn  { color: var(--fn); }
+.op  { color: var(--op); }
+.cm  { color: var(--cm); font-style: italic; }
+.var { color: #f07178; }
+.bln { color: var(--teal); }
+
+/* blank input */
+.blank-input {
+  display: inline-block;
+  background: rgba(0, 212, 170, 0.08);
+  border: 1.5px solid var(--teal);
+  border-radius: 5px;
+  padding: 1px 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  color: var(--teal);
+  outline: none;
+  transition: all 0.18s;
+  text-align: center;
+  white-space: pre;
+  vertical-align: middle;
+  min-width: 60px;
+  margin: 0 2px;
+}
+
+.blank-input:focus {
+  border-color: #00efc0;
+  background: rgba(0, 212, 170, 0.15);
+  box-shadow: 0 0 0 3px rgba(0,212,170,0.15);
+}
+
+.blank-input.filled {
+  background: rgba(0, 212, 170, 0.12);
+  border-color: var(--teal);
+}
+
+/* nav row */
+.quiz-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.nav-left { display: flex; gap: 10px; }
+.nav-right { display: flex; gap: 10px; }
+
+/* dot progress */
+.dot-progress {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.dot-q {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: background 0.2s;
+}
+
+.dot-q.answered { background: var(--muted2); }
+.dot-q.current  { background: var(--accent); transform: scale(1.3); }
+.dot-q.correct  { background: var(--teal); }
+.dot-q.wrong    { background: var(--red); }
+
+/* ── Results Screen ───────────────────────────────────────── */
+.results-wrapper {
+  width: 100%;
+  max-width: 720px;
+}
+
+.results-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.score-ring-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.score-ring {
+  position: relative;
+  width: 140px;
+  height: 140px;
+}
+
+.score-ring svg {
+  transform: rotate(-90deg);
+  width: 140px;
+  height: 140px;
+}
+
+.ring-bg { fill: none; stroke: var(--border); stroke-width: 8; }
+.ring-fill {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s ease;
+}
+
+.score-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.score-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.score-total {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.results-header h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 6px;
+}
+
+.results-header .grade-msg {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* review list */
+.review-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.review-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 28px;
+  max-height: 380px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.review-grid::-webkit-scrollbar { width: 4px; }
+.review-grid::-webkit-scrollbar-track { background: transparent; }
+.review-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.review-item {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.review-item.correct { border-left: 3px solid var(--teal); }
+.review-item.wrong   { border-left: 3px solid var(--red); }
+
+.review-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  width: 22px;
+  text-align: center;
+}
+
+.review-body { flex: 1; min-width: 0; }
+
+.review-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 2px;
+}
+
+.review-qnum {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.review-topic {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.review-detail {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.review-detail .yours { color: var(--red); }
+.review-detail .correct-ans { color: var(--teal); }
+
+/* results action row */
+.results-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .welcome-card { padding: 36px 24px 32px; }
+  .stats-row { gap: 12px; }
+  .code-body { font-size: 13px; }
+  .blank-input { font-size: 13px; min-width: 50px; }
+  .quiz-topbar { flex-wrap: wrap; gap: 8px; }
+}
+
+/* ── Transitions ──────────────────────────────────────────── */
+.screen { animation: fadeIn 0.25s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.question-card { animation: slideUp 0.22s ease; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ══ SCREEN: WELCOME ══════════════════════════════════════ -->
+  <div id="screenWelcome" class="screen active">
+    <div class="welcome-card">
+      <div class="logo-icon">{ }</div>
+      <h1>Python Quiz</h1>
+      <p class="subtitle">TechBridge Institute — Fill in the missing code</p>
+
+      <div class="stats-row">
+        <div class="stat">
+          <div class="stat-num">20</div>
+          <div class="stat-label">Questions</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">0</div>
+          <div class="stat-label">Hints</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">∞</div>
+          <div class="stat-label">Retries</div>
+        </div>
+      </div>
+
+      <div class="name-label">Your Name</div>
+      <input type="text" id="studentName" placeholder="e.g. Kabir Ahmed" autocomplete="off"/>
+
+      <ul class="rules-list">
+        <li>Read each code block carefully</li>
+        <li>Type your answer in the highlighted blank(s)</li>
+        <li>Navigate freely — answers are saved</li>
+        <li>Submit after the last question to see your score</li>
+      </ul>
+
+      <button class="btn btn-primary" onclick="startQuiz()">
+        Start Quiz &nbsp;→
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN: QUIZ ═════════════════════════════════════════ -->
+  <div id="screenQuiz" class="screen">
+    <div class="quiz-wrapper">
+
+      <div class="quiz-topbar">
+        <div class="quiz-meta">
+          <span class="q-counter">Question <span id="qNum">1</span> / 20</span>
+          <span class="topic-badge" id="qTopic">String Methods</span>
+        </div>
+        <span class="student-tag" id="studentTag"></span>
+      </div>
+
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill" style="width:5%"></div>
+      </div>
+
+      <div class="dot-progress" id="dotProgress"></div>
+
+      <div class="question-card" id="questionCard">
+        <!-- rendered by JS -->
+      </div>
+
+      <div class="quiz-nav">
+        <div class="nav-left">
+          <button class="btn btn-ghost" id="btnPrev" onclick="goTo(currentQ - 1)">← Prev</button>
+        </div>
+        <div class="nav-right">
+          <button class="btn btn-ghost" id="btnNext" onclick="goTo(currentQ + 1)">Next →</button>
+          <button class="btn btn-success" id="btnSubmit" onclick="submitQuiz()" style="display:none">Submit Quiz ✓</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN: RESULTS ══════════════════════════════════════ -->
+  <div id="screenResults" class="screen">
+    <div class="results-wrapper">
+      <div class="results-header">
+        <div class="score-ring-wrap">
+          <div class="score-ring">
+            <svg viewBox="0 0 140 140">
+              <circle class="ring-bg" cx="70" cy="70" r="58"/>
+              <circle class="ring-fill" id="ringFill" cx="70" cy="70" r="58"
+                stroke="#4f8ef7"
+                stroke-dasharray="364.4"
+                stroke-dashoffset="364.4"/>
+            </svg>
+            <div class="score-text">
+              <div class="score-num" id="scoreNum">0</div>
+              <div class="score-total">out of 20</div>
+            </div>
+          </div>
+        </div>
+        <h2 id="resultName">Well done!</h2>
+        <p class="grade-msg" id="gradeMsg"></p>
+      </div>
+
+      <div class="review-title">Question Review</div>
+      <div class="review-grid" id="reviewGrid"></div>
+
+      <div class="results-actions">
+        <button class="btn btn-ghost" onclick="retryQuiz()">↺ &nbsp;Retry Quiz</button>
+        <button class="btn btn-primary" onclick="newStudent()" style="width:auto">New Student</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ══ QUIZ DATA ══════════════════════════════════════════════════
+// Each question:
+//   code    : string with ___ for blanks (rendered with syntax highlight)
+//   blanks  : array of correct answers in order
+//   topic   : badge label
+
+const QUESTIONS = [
+  {
+    topic: "String upper()",
+    code: `city = "karachi"\nprint(city.___())`,
+    blanks: ["upper"]
+  },
+  {
+    topic: "String lower()",
+    code: `word = "PYTHON"\nprint(word.___())`,
+    blanks: ["lower"]
+  },
+  {
+    topic: "String replace()",
+    code: `msg = "I like cats"\nnew_msg = msg.___("cats", "dogs")\nprint(new_msg)`,
+    blanks: ["replace"]
+  },
+  {
+    topic: "String strip()",
+    code: `name = "   Sindh   "\nprint(name.___())`,
+    blanks: ["strip"]
+  },
+  {
+    topic: "String split()",
+    code: `sentence = "apple banana mango"\nfruits = sentence.___()\nprint(fruits)`,
+    blanks: ["split"]
+  },
+  {
+    topic: "len() function",
+    code: `country = "Pakistan"\nprint(___(country))`,
+    blanks: ["len"]
+  },
+  {
+    topic: "if Statement",
+    code: `marks = 50\n\n___ marks >= 33:\n    print("Pass")`,
+    blanks: ["if"]
+  },
+  {
+    topic: "if-else",
+    code: `temperature = 10\n\nif temperature < 20:\n    print("It is cold.")\n___:\n    print("It is warm.")`,
+    blanks: ["else"]
+  },
+  {
+    topic: "Logical AND",
+    code: `age = 20\nhas_id = True\n\nif age >= 18 ___ has_id:\n    print("Entry allowed.")`,
+    blanks: ["and"]
+  },
+  {
+    topic: "Logical OR",
+    code: `is_student = False\nis_teacher = True\n\nif is_student ___ is_teacher:\n    print("Access granted.")`,
+    blanks: ["or"]
+  },
+  {
+    topic: "Logical NOT",
+    code: `is_banned = False\n\nif ___ is_banned:\n    print("Welcome!")`,
+    blanks: ["not"]
+  },
+  {
+    topic: "in Operator",
+    code: `vowels = "aeiou"\n\nif "a" ___ vowels:\n    print("It is a vowel.")`,
+    blanks: ["in"]
+  },
+  {
+    topic: "not in Operator",
+    code: `colors = ["red", "blue", "green"]\n\nif "yellow" ___ ___ colors:\n    print("Yellow is missing.")`,
+    blanks: ["not", "in"]
+  },
+  {
+    topic: "!= Operator",
+    code: `role = "student"\n\nif role ___ "teacher":\n    print("You are not a teacher.")`,
+    blanks: ["!="]
+  },
+  {
+    topic: "elif Statement",
+    code: `score = 75\n\nif score >= 90:\n    print("A grade")\n___ score >= 60:\n    print("B grade")\nelse:\n    print("C grade")`,
+    blanks: ["elif"]
+  },
+  {
+    topic: "String + concat",
+    code: `first = "Hyderabad"\nsecond = " Sindh"\nresult = first ___ second\nprint(result)`,
+    blanks: ["+"]
+  },
+  {
+    topic: "String * repeat",
+    code: `line = "-"\nprint(line ___ 5)`,
+    blanks: ["*"]
+  },
+  {
+    topic: "String Index [0]",
+    code: `language = "Python"\nprint(language[___])`,
+    blanks: ["0"]
+  },
+  {
+    topic: "Boolean True",
+    code: `is_raining = ___\n\nif is_raining:\n    print("Take an umbrella.")`,
+    blanks: ["True"]
+  },
+  {
+    topic: "Nested if",
+    code: `age = 25\nhas_licence = True\n\nif age >= 18:\n    ___ has_licence:\n        print("You can drive.")`,
+    blanks: ["if"]
+  }
+];
+
+// ══ STATE ══════════════════════════════════════════════════════
+let currentQ   = 0;
+let answers    = QUESTIONS.map(q => q.blanks.map(() => ""));
+let studentName = "";
+
+// ══ SCREEN MANAGEMENT ══════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ══ WELCOME ════════════════════════════════════════════════════
+function startQuiz() {
+  const inp = document.getElementById('studentName');
+  const name = inp.value.trim();
+  if (!name) {
+    inp.classList.add('error');
+    inp.focus();
+    setTimeout(() => inp.classList.remove('error'), 600);
+    return;
+  }
+  studentName = name;
+  currentQ = 0;
+  answers = QUESTIONS.map(q => q.blanks.map(() => ""));
+  buildDotProgress();
+  renderQuestion(0);
+  showScreen('screenQuiz');
+}
+
+document.getElementById('studentName').addEventListener('keydown', e => {
+  if (e.key === 'Enter') startQuiz();
+});
+
+// ══ DOT PROGRESS ═══════════════════════════════════════════════
+function buildDotProgress() {
+  const wrap = document.getElementById('dotProgress');
+  wrap.innerHTML = '';
+  QUESTIONS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot-q';
+    d.id = `dotQ${i}`;
+    d.title = `Q${i+1}`;
+    d.onclick = () => goTo(i);
+    d.style.cursor = 'pointer';
+    wrap.appendChild(d);
+  });
+}
+
+function updateDots() {
+  QUESTIONS.forEach((_, i) => {
+    const d = document.getElementById(`dotQ${i}`);
+    d.className = 'dot-q';
+    if (i === currentQ) {
+      d.classList.add('current');
+    } else if (answers[i].some(a => a !== "")) {
+      d.classList.add('answered');
+    }
+  });
+}
+
+// ══ SYNTAX HIGHLIGHT ═══════════════════════════════════════════
+// Tokenizes a Python code string into an array of {type, text} tokens
+function tokenizePython(line) {
+  const tokens = [];
+  let i = 0;
+
+  // keywords
+  const keywords = ['if','else','elif','and','or','not','in','True','False','None',
+                    'for','while','def','class','return','import','from','print',
+                    'not in','is','is not'];
+
+  while (i < line.length) {
+    // string literals
+    if (line[i] === '"' || line[i] === "'") {
+      const q = line[i];
+      let j = i + 1;
+      while (j < line.length && line[j] !== q) {
+        if (line[j] === '\\') j++;
+        j++;
+      }
+      j++;
+      tokens.push({ type: 'str', text: line.slice(i, j) });
+      i = j;
+      continue;
+    }
+    // comments
+    if (line[i] === '#') {
+      tokens.push({ type: 'cm', text: line.slice(i) });
+      break;
+    }
+    // numbers
+    if (/[0-9]/.test(line[i])) {
+      let j = i;
+      while (j < line.length && /[0-9.]/.test(line[j])) j++;
+      tokens.push({ type: 'num', text: line.slice(i, j) });
+      i = j;
+      continue;
+    }
+    // operators
+    const ops = ['!=','==','<=','>=','->','**','//',':='];
+    let matchedOp = false;
+    for (const op of ops) {
+      if (line.startsWith(op, i)) {
+        tokens.push({ type: 'op', text: op });
+        i += op.length;
+        matchedOp = true;
+        break;
+      }
+    }
+    if (matchedOp) continue;
+
+    if ('=+-*/<>!%&|^~'.includes(line[i]) && line[i] !== '_') {
+      tokens.push({ type: 'op', text: line[i] });
+      i++;
+      continue;
+    }
+    // identifiers / keywords
+    if (/[a-zA-Z_]/.test(line[i])) {
+      let j = i;
+      while (j < line.length && /[a-zA-Z0-9_]/.test(line[j])) j++;
+      const word = line.slice(i, j);
+      // check 2-word keyword (not in)
+      if (word === 'not' && line.slice(j).match(/^\s+in\b/)) {
+        // leave as identifier, will match 'not' alone
+      }
+      if (keywords.includes(word)) {
+        // builtin functions
+        const builtins = ['print','len','range','type','input','int','str','float','list','dict','set'];
+        if (builtins.includes(word)) {
+          tokens.push({ type: 'fn', text: word });
+        } else {
+          tokens.push({ type: 'kw', text: word });
+        }
+      } else {
+        // check if followed by (
+        const after = line.slice(j).trimStart();
+        if (after.startsWith('(')) {
+          tokens.push({ type: 'fn', text: word });
+        } else {
+          tokens.push({ type: 'var', text: word });
+        }
+      }
+      i = j;
+      continue;
+    }
+    // everything else (brackets, spaces, colons, etc.)
+    tokens.push({ type: 'plain', text: line[i] });
+    i++;
+  }
+  return tokens;
+}
+
+function tokensToSpans(tokens) {
+  return tokens.map(t => {
+    if (t.type === 'plain') return escHtml(t.text);
+    return `<span class="${t.type}">${escHtml(t.text)}</span>`;
+  }).join('');
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ══ RENDER QUESTION ════════════════════════════════════════════
+function renderQuestion(idx) {
+  saveCurrentInputs();
+  currentQ = idx;
+
+  const q = QUESTIONS[idx];
+  document.getElementById('qNum').textContent = idx + 1;
+  document.getElementById('qTopic').textContent = q.topic;
+  document.getElementById('studentTag').textContent = studentName;
+  document.getElementById('progressFill').style.width = `${((idx + 1) / QUESTIONS.length) * 100}%`;
+
+  // prev/next/submit visibility
+  document.getElementById('btnPrev').style.visibility = idx === 0 ? 'hidden' : 'visible';
+  const isLast = idx === QUESTIONS.length - 1;
+  document.getElementById('btnNext').style.display   = isLast ? 'none' : 'inline-flex';
+  document.getElementById('btnSubmit').style.display = isLast ? 'inline-flex' : 'none';
+
+  // build code card
+  const card = document.getElementById('questionCard');
+  card.innerHTML = '';
+
+  const prompt = document.createElement('div');
+  prompt.className = 'card-prompt';
+  prompt.innerHTML = `<strong>Fill in the blank${q.blanks.length > 1 ? 's' : ''}.</strong> Complete the Python code below:`;
+  card.appendChild(prompt);
+
+  const editor = document.createElement('div');
+  editor.className = 'code-editor';
+
+  // title bar
+  const tb = document.createElement('div');
+  tb.className = 'editor-titlebar';
+  tb.innerHTML = `
+    <span class="dot dot-r"></span>
+    <span class="dot dot-y"></span>
+    <span class="dot dot-g"></span>
+    <span class="editor-filename">main.py</span>
+  `;
+  editor.appendChild(tb);
+
+  // code body
+  const body = document.createElement('div');
+  body.className = 'code-body';
+
+  const codeLines = q.code.split('\n');
+  let blankIdx = 0;
+  const inputIds = [];
+
+  codeLines.forEach((rawLine, lineNo) => {
+    const lineDiv = document.createElement('div');
+    lineDiv.className = 'code-line';
+
+    const numSpan = document.createElement('span');
+    numSpan.className = 'line-num';
+    numSpan.textContent = lineNo + 1;
+    lineDiv.appendChild(numSpan);
+
+    const contentDiv = document.createElement('span');
+    contentDiv.className = 'line-content';
+
+    // split by ___
+    const parts = rawLine.split('___');
+    parts.forEach((part, pi) => {
+      // tokenize & render this part
+      const tokens = tokenizePython(part);
+      const html = tokensToSpans(tokens);
+
+      if (html) {
+        const s = document.createElement('span');
+        s.innerHTML = html;
+        contentDiv.appendChild(s);
+      }
+
+      // insert blank input if not last part
+      if (pi < parts.length - 1) {
+        const bIdx = blankIdx;
+        const savedVal = answers[idx][bIdx] || '';
+        const ansLen = q.blanks[bIdx] ? q.blanks[bIdx].length : 4;
+        const inputW = Math.max(ansLen * 10 + 24, 60);
+
+        const inp = document.createElement('input');
+        inp.type = 'text';
+        inp.className = 'blank-input' + (savedVal ? ' filled' : '');
+        inp.style.width = inputW + 'px';
+        inp.value = savedVal;
+        inp.autocomplete = 'off';
+        inp.spellcheck = false;
+        inp.dataset.blankIdx = bIdx;
+        const uid = `blank_${idx}_${bIdx}`;
+        inp.id = uid;
+        inputIds.push(uid);
+
+        inp.addEventListener('input', function() {
+          answers[currentQ][parseInt(this.dataset.blankIdx)] = this.value.trim();
+          this.classList.toggle('filled', this.value.trim() !== '');
+          // auto-resize width
+          const len = Math.max(this.value.length, q.blanks[bIdx].length, 4);
+          this.style.width = (len * 10 + 24) + 'px';
+        });
+
+        inp.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' || e.key === 'Tab') {
+            e.preventDefault();
+            const pos = inputIds.indexOf(this.id);
+            if (pos < inputIds.length - 1) {
+              document.getElementById(inputIds[pos + 1])?.focus();
+            } else {
+              // last blank — move to next question
+              if (currentQ < QUESTIONS.length - 1) goTo(currentQ + 1);
+            }
+          }
+        });
+
+        contentDiv.appendChild(inp);
+        blankIdx++;
+      }
+    });
+
+    lineDiv.appendChild(contentDiv);
+    body.appendChild(lineDiv);
+  });
+
+  editor.appendChild(body);
+  card.appendChild(editor);
+
+  // focus first blank
+  if (inputIds.length > 0) {
+    setTimeout(() => document.getElementById(inputIds[0])?.focus(), 50);
+  }
+
+  updateDots();
+}
+
+// ══ NAVIGATION ═════════════════════════════════════════════════
+function saveCurrentInputs() {
+  document.querySelectorAll('.blank-input').forEach(inp => {
+    const bIdx = parseInt(inp.dataset.blankIdx);
+    if (!isNaN(bIdx)) {
+      answers[currentQ][bIdx] = inp.value.trim();
+    }
+  });
+}
+
+function goTo(idx) {
+  if (idx < 0 || idx >= QUESTIONS.length) return;
+  saveCurrentInputs();
+  renderQuestion(idx);
+}
+
+// ══ SUBMIT ═════════════════════════════════════════════════════
+function submitQuiz() {
+  saveCurrentInputs();
+
+  let score = 0;
+  const qResults = QUESTIONS.map((q, i) => {
+    const allCorrect = q.blanks.every((ans, j) =>
+      (answers[i][j] || '').toLowerCase().trim() === ans.toLowerCase()
+    );
+    if (allCorrect) score++;
+    return allCorrect;
+  });
+
+  showResults(score, qResults);
+}
+
+// ══ RESULTS ════════════════════════════════════════════════════
+function showResults(score, qResults) {
+  const pct = Math.round(score / QUESTIONS.length * 100);
+  let grade, gradeColor, msg;
+
+  if (pct >= 80) {
+    grade = "Excellent!";
+    gradeColor = "#00d4aa";
+    msg = `${studentName}, you clearly understand the concepts. Keep coding!`;
+  } else if (pct >= 60) {
+    grade = "Good Job!";
+    gradeColor = "#4f8ef7";
+    msg = `${studentName}, solid effort. Review the questions you missed.`;
+  } else if (pct >= 40) {
+    grade = "Keep Practicing";
+    gradeColor = "#fbbf24";
+    msg = `${studentName}, you're getting there. Go over the material again.`;
+  } else {
+    grade = "Needs More Work";
+    gradeColor = "#ff5757";
+    msg = `${studentName}, don't give up — review the lessons and try again.`;
+  }
+
+  // ring animation
+  const circumference = 2 * Math.PI * 58; // 364.4
+  const ring = document.getElementById('ringFill');
+  ring.style.stroke = gradeColor;
+  ring.style.strokeDasharray = circumference;
+  ring.style.strokeDashoffset = circumference;
+  setTimeout(() => {
+    ring.style.strokeDashoffset = circumference - (pct / 100) * circumference;
+  }, 100);
+
+  document.getElementById('scoreNum').textContent = score;
+  document.getElementById('scoreNum').style.color = gradeColor;
+  document.getElementById('resultName').textContent = `${grade} — ${pct}%`;
+  document.getElementById('resultName').style.color = gradeColor;
+  document.getElementById('gradeMsg').textContent = msg;
+
+  // review grid
+  const grid = document.getElementById('reviewGrid');
+  grid.innerHTML = '';
+  QUESTIONS.forEach((q, i) => {
+    const correct = qResults[i];
+    const item = document.createElement('div');
+    item.className = `review-item ${correct ? 'correct' : 'wrong'}`;
+
+    const yourAns = answers[i].join(', ') || '—';
+    const correctAns = q.blanks.join(', ');
+
+    item.innerHTML = `
+      <div class="review-icon">${correct ? '✓' : '✗'}</div>
+      <div class="review-body">
+        <div class="review-head">
+          <span class="review-qnum">Q${i+1}</span>
+          <span class="review-topic">${q.topic}</span>
+        </div>
+        ${!correct ? `
+        <div class="review-detail">
+          Your answer: <span class="yours">${escHtml(yourAns || '(empty)')}</span>
+          &nbsp;·&nbsp;
+          Correct: <span class="correct-ans">${escHtml(correctAns)}</span>
+        </div>` : ''}
+      </div>
+    `;
+    grid.appendChild(item);
+  });
+
+  showScreen('screenResults');
+}
+
+// ══ RETRY / NEW ════════════════════════════════════════════════
+function retryQuiz() {
+  answers = QUESTIONS.map(q => q.blanks.map(() => ""));
+  currentQ = 0;
+  buildDotProgress();
+  renderQuestion(0);
+  showScreen('screenQuiz');
+}
+
+function newStudent() {
+  document.getElementById('studentName').value = '';
+  showScreen('screenWelcome');
+}
+</script>
+</body>
+</html>
